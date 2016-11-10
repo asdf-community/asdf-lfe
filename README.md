@@ -13,3 +13,6 @@ asdf plugin-add lfe https://github.com/vic/asdf-lfe.git
 ## Use
 
 Check [asdf](https://github.com/asdf-vm/asdf) readme for instructions on how to install & manage versions of LFE.
+
+
+Derived from [asdf-elixir](https://github.com/asdf-vm/asdf-elixir)
