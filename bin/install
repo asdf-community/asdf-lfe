@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+
+install_lfe() {
+  local install_type=$1
+  local version=$2
+  local install_path=$3
+
+  if [ "$TMPDIR" = "" ]; then
+    local tmp_download_dir=$(mktemp -d -t lfe_build_XXXXXX)
+  else
+    local tmp_download_dir=$TMPDIR
+  fi
+
+  # path to the tar file
+  local source_path=$(get_download_file_path $install_type $version $tmp_download_dir)
+  download_source_file $install_type $version $source_path
+
+  # running this in a subshell
+  # we don't want to disturb current working dir
+  (
+    tar zxf $source_path -C $install_path --strip-components=1 || exit 1
+
+    cd $install_path
+    make compile
+
+    if [ $? -ne 0 ]; then
+        rm -rf $install_path
+        exit 1
+    fi
+  )
+}
+
+
+download_source_file() {
+  local install_type=$1
+  local version=$2
+  local download_path=$3
+  local download_url=$(get_download_url $install_type $version)
+
+  curl -Lo $download_path -C - $download_url
+}
+
+
+get_download_file_path() {
+  local install_type=$1
+  local version=$2
+  local tmp_download_dir=$3
+
+  local pkg_name="lfe-${install_type}-${version}-src.tar.gz"
+
+  echo "$tmp_download_dir/$pkg_name"
+}
+
+
+get_download_url() {
+  local install_type=$1
+  local version=$2
+
+  if [ "$install_type" = "version" ]
+  then
+    echo "https://github.com/rvirding/lfe/archive/v${version}.tar.gz"
+  else
+    echo "https://github.com/rvirding/lfe/archive/${version}.tar.gz"
+  fi
+}
+
+
+install_lfe $ASDF_INSTALL_TYPE $ASDF_INSTALL_VERSION $ASDF_INSTALL_PATH
