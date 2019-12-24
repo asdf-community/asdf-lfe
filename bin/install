@@ -21,7 +21,14 @@ install_lfe() {
     tar zxf $source_path -C $install_path --strip-components=1 || exit 1
 
     cd $install_path
-    make compile
+
+    # we need to help here in order to compile the lfeexec
+    # not sure why the rule is not trigger (bin/lfeexec).
+    $CC -o bin/lfeexec c_src/lfeexec.c || exit 1
+
+    # i think it's not necessary to set the PREFIX,
+    # but just in case something changes.
+    PREFIX=$install_path make compile
 
     if [ $? -ne 0 ]; then
         rm -rf $install_path
