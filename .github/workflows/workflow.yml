@@ -1,0 +1,56 @@
+name: Main workflow
+
+on:
+  push:
+    paths-ignore:
+      - '**.md'
+      - '.all-contributorsrc'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - '.all-contributorsrc'
+  schedule:
+    - cron: "0 0 * * 5"
+
+jobs:
+  plugin_test:
+    strategy:
+      matrix:
+        os: [macOS-latest, ubuntu-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: asdf_plugin_test
+        uses: asdf-vm/actions/plugin-test@v1.0.0
+        with:
+          command: lfe --version
+        env:
+          GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  lint:
+    runs-on: macOS-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v1
+
+      - name: Install shellcheck
+        run: brew install shellcheck
+
+      - name: Run ShellCheck
+        run: |
+          shellcheck bin/*
+
+  format:
+    runs-on: macOS-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v1
+
+      - name: Install shfmt
+        run: brew install shfmt
+
+      - name: Run shfmt
+        run: shfmt -d -i 2 -ci .
