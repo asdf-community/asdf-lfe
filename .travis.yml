@@ -1,5 +1,10 @@
-language: c
-script: asdf plugin-test lfe https://github.com/vic/asdf-lfe.git
+language: erlang
+opt_release:
+  - 22.0
 before_script:
   - git clone https://github.com/asdf-vm/asdf.git
   - . asdf/asdf.sh
+  - export CC=gcc
+script:
+  - asdf plugin-test lfe https://github.com/vic/asdf-lfe --asdf-tool-version latest --asdf-plugin-gitref ${TRAVIS_COMMIT} lfe -version
+
