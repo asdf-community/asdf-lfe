@@ -10,8 +10,7 @@ sort_versions() {
 list_all_versions() {
   git ls-remote --tags --refs https://github.com/lfe/lfe.git |
     grep -o 'refs/tags/.*' |
-    cut -d/ -f3- |
-    sed 's/^v//'
+    cut -d/ -f3-
 }
 
 list_all_versions | sort_versions | xargs echo
