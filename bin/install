@@ -5,6 +5,10 @@ install_lfe() {
   local version=$2
   local install_path=$3
 
+  if [[ -z $CC ]]; then
+    CC="cc"
+  fi
+
   if [ "$TMPDIR" = "" ]; then
     local tmp_download_dir=$(mktemp -d -t lfe_build_XXXXXX)
   else
