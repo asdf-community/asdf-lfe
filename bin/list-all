@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 
-releases_path=https://api.github.com/repos/rvirding/lfe/tags
-cmd="curl -s"
-if [ -n "$OAUTH_TOKEN" ]; then
-  cmd="$cmd -H 'Authorization: token $OAUTH_TOKEN'"
-fi
-cmd="$cmd $releases_path"
+set -Eeuo pipefail
 
-sort_cmd='sort'
-if sort --help | grep -q -- '-V'; then
-  sort_cmd='sort -V'
-fi
+sort_versions() {
+  sed 'h; s/[+-]/./g; s/.p\([[:digit:]]\)/.z\1/; s/$/.z/; G; s/\n/ /' |
+    LC_ALL=C sort -u -t. -k 1,1 -k 2,2n -k 3,3n -k 4,4n -k 5,5n | awk '{print $2}'
+}
 
-# Fetch all tag names, and get only second column. Then remove all unnecesary characters.
-versions=$(eval $cmd | grep -oE "name\": \"v.{1,15}\"," | sed 's/name\": \"v//;s/\",//' | $sort_cmd)
-echo $versions
+list_all_versions() {
+  git ls-remote --tags --refs https://github.com/lfe/lfe.git |
+    grep -o 'refs/tags/.*' |
+    cut -d/ -f3- |
+    sed 's/^v//'
+}
+
+list_all_versions | sort_versions | xargs echo
